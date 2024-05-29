@@ -33,20 +33,21 @@ def restore_ns():
     LIBC.setns(original_net_ns.fileno(), CLONE_NEWNET)
 
 
-def do_iptables(action, sport, dport, extra):
+def do_iptables(action, sport, dport, extra, interface='lo'):
     if sport:
         sport = '--sport %d' % (sport,)
         dport = ''
     else:
         sport = ''
         dport = '--dport %d' % (dport,)
-    os.system("iptables -%s INPUT -i lo -p tcp %s %s %s -j DROP" % (action, sport, dport, extra))
+    #os.system("iptables -%s INPUT -i lo -p tcp %s %s %s -j DROP" % (action, sport, dport, extra))
+    os.system(f"iptables -{action} INPUT -i {interface} -p tcp {sport} {dport} {extra} -j DROP")
 
-def drop_start(sport=None, dport=None, extra=''):
-    do_iptables('I', sport, dport, extra)
+def drop_start(sport=None, dport=None, extra='', interface='lo'):
+    do_iptables('I', sport, dport, extra, interface)
 
-def drop_stop(sport=None, dport=None, extra=''):
-    do_iptables('D', sport, dport, extra)
+def drop_stop(sport=None, dport=None, extra='', interface='lo'):
+    do_iptables('D', sport, dport, extra, interface)
 
 tcpdump_bin = os.popen('which tcpdump').read().strip()
 ss_bin = os.popen('which ss').read().strip()
