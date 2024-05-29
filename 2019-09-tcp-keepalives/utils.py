@@ -40,7 +40,6 @@ def do_iptables(action, sport, dport, extra, interface='lo'):
     else:
         sport = ''
         dport = '--dport %d' % (dport,)
-    #os.system("iptables -%s INPUT -i lo -p tcp %s %s %s -j DROP" % (action, sport, dport, extra))
     os.system(f"iptables -{action} INPUT -i {interface} -p tcp {sport} {dport} {extra} -j DROP")
 
 def drop_start(sport=None, dport=None, extra='', interface='lo'):
@@ -53,7 +52,6 @@ tcpdump_bin = os.popen('which tcpdump').read().strip()
 ss_bin = os.popen('which ss').read().strip()
 
 def tcpdump_start(port, interface='lo'):
-    #p = subprocess.Popen(shlex.split('%s -B 16384 --packet-buffered -n -ttttt -i lo port %s' % (tcpdump_bin, port)))
     p = subprocess.Popen(shlex.split(f'{tcpdump_bin} -B 16384 --packet-buffered -n -ttttt -i {interface} port {port}'))
     time.sleep(1)
     def close():
