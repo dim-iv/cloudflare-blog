@@ -13,6 +13,8 @@ import time
 
 LIBC = ctypes.CDLL("libc.so.6")
 
+DEFAULT_INTERFACE='lo'
+
 CLONE_NEWNET = 0x40000000
 original_net_ns = open("/proc/self/ns/net", 'rb')
 if True:
@@ -22,7 +24,7 @@ if True:
         sys.exit(-1)
     LIBC.setns(original_net_ns.fileno(), CLONE_NEWNET)
 
-def new_ns(interface='lo'):
+def new_ns(interface=DEFAULT_INTERFACE):
     r = LIBC.unshare(CLONE_NEWNET)
     if r != 0:
         print("[!] Are you root? Need unshare() syscall.")
@@ -33,7 +35,7 @@ def restore_ns():
     LIBC.setns(original_net_ns.fileno(), CLONE_NEWNET)
 
 
-def do_iptables(action, sport, dport, extra, interface='lo'):
+def do_iptables(action, sport, dport, extra, interface=DEFAULT_INTERFACE):
     if sport:
         sport = '--sport %d' % (sport,)
         dport = ''
@@ -42,16 +44,16 @@ def do_iptables(action, sport, dport, extra, interface='lo'):
         dport = '--dport %d' % (dport,)
     os.system(f"iptables -{action} INPUT -i {interface} -p tcp {sport} {dport} {extra} -j DROP")
 
-def drop_start(sport=None, dport=None, extra='', interface='lo'):
+def drop_start(sport=None, dport=None, extra='', interface=DEFAULT_INTERFACE):
     do_iptables('I', sport, dport, extra, interface)
 
-def drop_stop(sport=None, dport=None, extra='', interface='lo'):
+def drop_stop(sport=None, dport=None, extra='', interface=DEFAULT_INTERFACE):
     do_iptables('D', sport, dport, extra, interface)
 
 tcpdump_bin = os.popen('which tcpdump').read().strip()
 ss_bin = os.popen('which ss').read().strip()
 
-def tcpdump_start(port, interface='lo'):
+def tcpdump_start(port, interface=DEFAULT_INTERFACE):
     p = subprocess.Popen(shlex.split(f'{tcpdump_bin} -B 16384 --packet-buffered -n -ttttt -i {interface} port {port}'))
     time.sleep(1)
     def close():
