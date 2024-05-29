@@ -22,12 +22,12 @@ if True:
         sys.exit(-1)
     LIBC.setns(original_net_ns.fileno(), CLONE_NEWNET)
 
-def new_ns():
+def new_ns(interface='lo'):
     r = LIBC.unshare(CLONE_NEWNET)
     if r != 0:
         print("[!] Are you root? Need unshare() syscall.")
         sys.exit(-1)
-    os.system("ip link set lo up")
+    os.system("ip link set {interface} up")
 
 def restore_ns():
     LIBC.setns(original_net_ns.fileno(), CLONE_NEWNET)

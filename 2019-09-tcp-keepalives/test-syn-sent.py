@@ -4,18 +4,22 @@ import select
 import socket
 import time
 import utils
+import sys
 
 utils.new_ns()
 
 port = 1
 interface = "lo"
 
+if len(sys.argv) > 1:
+  interface = sys.argv[1]
+
 tcpdump = utils.tcpdump_start(port, interface)
 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 
 t0 = time.time()
 
-utils.drop_start(dport=port)
+utils.drop_start(dport=port, interface=interface)
 
 if False:
    c.setsockopt(socket.IPPROTO_TCP, socket.TCP_USER_TIMEOUT, 5*1000)
