@@ -51,8 +51,9 @@ def drop_stop(sport=None, dport=None, extra=''):
 tcpdump_bin = os.popen('which tcpdump').read().strip()
 ss_bin = os.popen('which ss').read().strip()
 
-def tcpdump_start(port):
-    p = subprocess.Popen(shlex.split('%s -B 16384 --packet-buffered -n -ttttt -i lo port %s' % (tcpdump_bin, port)))
+def tcpdump_start(port, interface='lo'):
+    #p = subprocess.Popen(shlex.split('%s -B 16384 --packet-buffered -n -ttttt -i lo port %s' % (tcpdump_bin, port)))
+    p = subprocess.Popen(shlex.split(f'{tcpdump_bin} -B 16384 --packet-buffered -n -ttttt -i {interface} port {port}')
     time.sleep(1)
     def close():
         p.send_signal(signal.SIGINT)

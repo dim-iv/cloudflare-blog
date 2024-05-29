@@ -8,8 +8,9 @@ import utils
 utils.new_ns()
 
 port = 1
+interface = "lo"
 
-tcpdump = utils.tcpdump_start(port)
+tcpdump = utils.tcpdump_start(port, interface)
 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 
 t0 = time.time()
